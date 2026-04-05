@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nutribridge</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Nutribridge</h1>
+      <p class="tagline">Micronutrient intelligence engine · dark clinical wellness UI</p>
+      <small>{{ app_version }} · LLM {{ model_version }}</small>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>Mission</h2>
+        <p>
+          Hidden hunger affects over 2 billion people. Nutribridge analyzes symptoms, diet,
+          lifestyle, scans, and cultural context to detect likely micronutrient gaps with
+          confidence scoring and sprint-style recovery planning.
+        </p>
+      </section>
+
+      <section class="grid two-col">
+        <div class="card">
+          <h2>Auth (JWT)</h2>
+          <input id="name" placeholder="Full name" />
+          <input id="email" placeholder="Email" />
+          <input id="password" type="password" placeholder="Password" />
+          <div class="row">
+            <button onclick="registerUser()">Register</button>
+            <button onclick="loginUser()">Login</button>
+          </div>
+          <small id="auth-status">Not authenticated.</small>
+        </div>
+
+        <div class="card">
+          <h2>Run Deficiency Matrix</h2>
+          <label>Symptoms (comma separated)</label>
+          <input id="symptoms" value="fatigue, brain fog, muscle cramps" />
+          <label>Cultural Context</label>
+          <input id="culture" value="South Asian" />
+          <button onclick="runAnalysis()">Analyze</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Analysis Output (Structured)</h2>
+        <pre id="output">Run analysis after authentication.</pre>
+      </section>
+
+      <section class="card">
+        <h2>Team Structure & Roles</h2>
+        <div id="team" class="team-grid"></div>
+      </section>
+
+      <section class="card">
+        <h2>Business Model Snapshot</h2>
+        <ul>
+          <li>Freemium: 3 scans/day free. Premium: $4.99/mo or $49.99/yr.</li>
+          <li>B2B Pro tools: $29.99/mo per professional seat.</li>
+          <li>Highest revenue path: healthcare API + white-label licensing.</li>
+          <li>Institutional/government contracts + anonymized data insights (opt-in).</li>
+        </ul>
+      </section>
+    </main>
+
+    <script>
+      let token = "";
+
+      async function registerUser() {
+        const payload = {
+          full_name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value,
+        };
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (data.token) {
+          token = data.token;
+          document.getElementById("auth-status").innerText = `Authenticated as ${data.full_name}`;
+        } else {
+          document.getElementById("auth-status").innerText = JSON.stringify(data);
+        }
+      }
+
+      async function loginUser() {
+        const payload = {
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value,
+        };
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (data.token) {
+          token = data.token;
+          document.getElementById("auth-status").innerText = `Authenticated as ${data.full_name}`;
+        } else {
+          document.getElementById("auth-status").innerText = JSON.stringify(data);
+        }
+      }
+
+      async function runAnalysis() {
+        const symptoms = document.getElementById("symptoms").value.split(",").map((s) => s.trim());
+        const symptomObjects = symptoms.filter(Boolean).map((name) => ({ name, severity: 7 }));
+        const payload = {
+          age: 31,
+          sex: "female",
+          weight_kg: 68,
+          activity_level: "moderate",
+          sleep_quality: 5,
+          water_intake_liters: 1.8,
+          medications: ["Metformin 500mg"],
+          conditions: ["Prediabetes"],
+          symptoms: symptomObjects,
+          diet_type: "omnivore",
+          cultural_context: document.getElementById("culture").value,
+          budget_usd_per_week: 70,
+          scanned_inputs: {
+            meal_photo: "pending",
+            bloodwork_pdf: "pending",
+            supplement_label: "pending",
+            grocery_receipt: "pending",
+          },
+        };
+
+        const res = await fetch("/api/analysis", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        document.getElementById("output").innerText = JSON.stringify(data, null, 2);
+      }
+
+      async function loadTeam() {
+        const res = await fetch("/api/about/team");
+        const data = await res.json();
+        const team = document.getElementById("team");
+        data.team.forEach((member) => {
+          const card = document.createElement("div");
+          card.className = "team-card";
+          card.innerHTML = `
+            <img src="${member.photo}" alt="${member.name}" />
+            <h3>${member.name}</h3>
+            <strong>${member.role}</strong>
+            <p>${member.bio}</p>
+            <p><em>${member.contribution}</em></p>
+          `;
+          team.appendChild(card);
+        });
+      }
+
+      loadTeam();
+    </script>
+  </body>
+</html>

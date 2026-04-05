@@ -1,0 +1,116 @@
+:root {
+  --bg: #0c1118;
+  --card: #151c27;
+  --text: #dfebff;
+  --muted: #8ea0be;
+  --accent: #49a8ff;
+  --border: #243149;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #101a2b 0%, var(--bg) 40%);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+header {
+  padding: 32px 24px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.tagline {
+  color: var(--muted);
+  margin: 4px 0;
+}
+
+main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 20px;
+  display: grid;
+  gap: 16px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.grid.two-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+input,
+button {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 10px;
+  background: #0f1621;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+button {
+  cursor: pointer;
+  background: linear-gradient(180deg, #1b3a63, #143054);
+  border-color: #2f5f94;
+}
+
+button:hover {
+  filter: brightness(1.12);
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+pre {
+  max-height: 420px;
+  overflow: auto;
+  background: #0a0f17;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+.team-card {
+  background: #101722;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.team-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+small,
+label {
+  color: var(--muted);
+}
